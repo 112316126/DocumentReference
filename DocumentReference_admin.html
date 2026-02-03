@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DocumentReference_admin.html（檢驗科｜管理者端）</title>
+  <style>
+    body { font-family: Arial, "Microsoft JhengHei", sans-serif; margin: 18px; line-height: 1.45; }
+    h1 { font-size: 20px; margin: 0 0 10px; }
+    h2 { font-size: 16px; margin: 18px 0 8px; }
+    .box { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin: 10px 0; }
+    .row { display: grid; grid-template-columns: 180px 1fr; gap: 10px; margin: 8px 0; align-items: center; }
+    label { color: #333; }
+    input, select, textarea, button { font: inherit; }
+    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
+    textarea { min-height: 72px; resize: vertical; }
+    button { padding: 8px 12px; border: 1px solid #444; background: #fff; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #f5f5f5; }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .hint { color: #555; font-size: 13px; }
+    .warn { color: #8a3b00; font-size: 13px; }
+    .ok { color: #1f6f2a; }
+    .err { color: #a11; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #fafafa; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    .small { font-size: 12px; color: #555; }
+    .divider { height: 1px; background: #eee; margin: 12px 0; }
+    .hidden { display: none; }
+  </style>
+</head>
+
+<body>
+  <h1>FHIR DocumentReference（檢驗科｜管理者端 Admin/IT）</h1>
+  <div class="hint">
+    模擬情境：檢驗報告 PDF 本體放雲端；FHIR Server 只存索引（metadata + 連結）。
+  </div>
+
+  <div class="box">
+    <h2>0) 伺服器設定</h2>
+    <div class="row">
+      <label>FHIR Server Base URL</label>
+      <input id="baseUrl" value="https://hapi.fhir.tw/fhir" />
+    </div>
+    <div class="hint">如果你們之後換成自己的 HAPI Server，只要改這裡。</div>
+  </div>
+
+  <div class="box">
+    <h2>1) 建立 DocumentReference（建立索引）</h2>
+
+    <div class="row">
+      <label>病人 ID（必填）</label>
+      <input id="c_patientId" placeholder="例如：1326" />
+    </div>
+
+    <div class="row">
+      <label>報告標題 title（必填）</label>
+      <input id="c_title" placeholder="例如：血液檢驗報告（CBC）" />
+    </div>
+
+    <div class="row">
+      <label>雲端 PDF 連結 url（必填）</label>
+      <input id="c_url" placeholder="例如：https://.../report.pdf" />
+    </div>
+
+    <div class="row">
+      <label>檔案格式 contentType（固定）</label>
+      <input id="c_contentType" value="application/pdf" />
+    </div>
+
+    <div class="row">
+      <label>科別 category（固定/建議）</label>
+      <input id="c_category" value="檢驗科" />
+    </div>
+
+    <div class="row">
+      <label>文件類型 type（固定/建議）</label>
+      <input id="c_type" value="檢驗報告" />
+    </div>
+
+    <div class="row">
+      <label>就診/住院 Encounter（選填）</label>
+      <input id="c_encounter" placeholder="例如：Encounter/123（可留空）" />
+    </div>
+
+    <div class="row">
+      <label>備註 description（選填）</label>
+      <textarea id="c_description" placeholder="例如：此索引為檢驗科上傳；檔案本體在雲端"></textarea>
+    </div>
+
+    <div class="row">
+      <label>文件狀態 docStatus（選填）</label>
+      <input id="c_docStatus" placeholder="例如：final / preliminary（可留空）" />
+    </div>
+
+    <div class="btns">
+      <button id="btnCreate">建立索引（POST DocumentReference）</button>
+      <button id="btnCreateDemo">快速填入範例</button>
+    </div>
+
+    <div id="createMsg" class="small"></div>
+  </div>
+
+  <div class="box">
+    <h2>2) 依病人查詢 DocumentReference（看清單）</h2>
+
+    <div class="row">
+      <label>病人 ID</label>
+      <input id="s_patientId" placeholder="例如：1326" />
+    </div>
+
+    <div class="btns">
+      <button id="btnSearch">查詢（GET DocumentReference?subject=Patient/{id}）</button>
+      <button id="btnClear">清空結果</button>
+    </div>
+
+    <div id="searchMsg" class="small"></div>
+
+    <table id="resultTable" class="hidden">
+      <thead>
+        <tr>
+          <th style="width:120px;">DocRef ID</th>
+          <th>標題 / 分類</th>
+          <th style="width:200px;">狀態</th>
+          <th style="width:210px;">操作</th>
+        </tr>
+      </thead>
+      <tbody id="resultBody"></tbody>
+    </table>
+  </div>
+
+  <div class="box hidden" id="editBox">
+    <h2>3) 修改 DocumentReference（僅限 metadata｜含下架/作廢）</h2>
+    <div class="warn">
+      管理者主要修改：status（下架/作廢）、url（連結失效替換）、title、contentType、type/category、subject（少用）、encounter、description/docStatus。
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <label>DocRef ID</label>
+      <input id="e_id" readonly />
+    </div>
+
+    <div class="row">
+      <label>status（下架/作廢用）</label>
+      <select id="e_status">
+        <option value="current">current（正常）</option>
+        <option value="superseded">superseded（被新版取代）</option>
+        <option value="entered-in-error">entered-in-error（作廢/錯誤）</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <label>病人 subject（少用）</label>
+      <input id="e_subject" placeholder="例如：Patient/1326" />
+    </div>
+
+    <div class="row">
+      <label>雲端連結 content.attachment.url</label>
+      <input id="e_url" />
+    </div>
+
+    <div class="row">
+      <label>contentType</label>
+      <input id="e_contentType" value="application/pdf" />
+    </div>
+
+    <div class="row">
+      <label>title</label>
+      <input id="e_title" />
+    </div>
+
+    <div class="row">
+      <label>type（文件類型）</label>
+      <input id="e_type" />
+    </div>
+
+    <div class="row">
+      <label>category（科別）</label>
+      <input id="e_category" />
+    </div>
+
+    <div class="row">
+      <label>context.encounter（選填）</label>
+      <input id="e_encounter" placeholder="例如：Encounter/123（可留空）" />
+    </div>
+
+    <div class="row">
+      <label>description</label>
+      <textarea id="e_description"></textarea>
+    </div>
+
+    <div class="row">
+      <label>docStatus</label>
+      <input id="e_docStatus" placeholder="例如：final" />
+    </div>
+
+    <div class="btns">
+      <button id="btnUpdate">儲存修改（PUT DocumentReference/{id}）</button>
+      <button id="btnTakeDown">一鍵下架（status = entered-in-error）</button>
+      <button id="btnCloseEdit">關閉</button>
+    </div>
+
+    <div id="editMsg" class="small"></div>
+
+    <details style="margin-top:10px;">
+      <summary>查看目前資源 JSON（debug）</summary>
+      <pre id="jsonPreview" class="mono"></pre>
+    </details>
+  </div>
+
+<script>
+  // =========================
+  // 小工具
+  // =========================
+  function base() {
+    return document.getElementById('baseUrl').value.replace(/\/+$/, '');
+  }
+  function setMsg(elId, text, type) {
+    const el = document.getElementById(elId);
+    el.className = "small " + (type === "ok" ? "ok" : type === "err" ? "err" : "");
+    el.textContent = text || "";
+  }
+  async function fhirFetch(url, options = {}) {
+    const headers = Object.assign({
+      "Accept": "application/fhir+json",
+    }, options.headers || {});
+    const res = await fetch(url, Object.assign({}, options, { headers }));
+    let data = null;
+    const ct = res.headers.get("content-type") || "";
+    if (ct.includes("json")) {
+      data = await res.json().catch(() => null);
+    } else {
+      data = await res.text().catch(() => null);
+    }
+    if (!res.ok) {
+      const msg = (data && data.issue && data.issue[0] && data.issue[0].diagnostics) ? data.issue[0].diagnostics : (typeof data === "string" ? data : "");
+      throw new Error(`HTTP ${res.status} ${res.statusText}${msg ? " - " + msg : ""}`);
+    }
+    return data;
+  }
+
+  function makeDocRefPayload() {
+    const patientId = document.getElementById('c_patientId').value.trim();
+    const title = document.getElementById('c_title').value.trim();
+    const url = document.getElementById('c_url').value.trim();
+    const contentType = document.getElementById('c_contentType').value.trim() || "application/pdf";
+    const category = document.getElementById('c_category').value.trim() || "檢驗科";
+    const type = document.getElementById('c_type').value.trim() || "檢驗報告";
+    const encounter = document.getElementById('c_encounter').value.trim();
+    const description = document.getElementById('c_description').value.trim();
+    const docStatus = document.getElementById('c_docStatus').value.trim();
+
+    if (!patientId) throw new Error("病人 ID 必填");
+    if (!title) throw new Error("title 必填");
+    if (!url) throw new Error("雲端 PDF 連結 url 必填");
+
+    const now = new Date().toISOString();
+
+    const docRef = {
+      resourceType: "DocumentReference",
+      status: "current",
+      subject: { reference: `Patient/${patientId}` },
+      date: now,
+      type: { text: type },
+      category: [{ text: category }],
+      content: [{
+        attachment: {
+          contentType: contentType,
+          url: url,
+          title: title
+        }
+      }]
+    };
+
+    if (description) docRef.description = description;
+    if (docStatus) docRef.docStatus = { text: docStatus };
+    if (encounter) docRef.context = { encounter: [{ reference: encounter }] };
+
+    return docRef;
+  }
+
+  // =========================
+  // 建立（Create）
+  // =========================
+  document.getElementById('btnCreateDemo').addEventListener('click', () => {
+    document.getElementById('c_patientId').value = "1326";
+    document.getElementById('c_title').value = "檢驗報告 PDF（示例）";
+    document.getElementById('c_url').value = "https://example.com/lab-report.pdf";
+    document.getElementById('c_contentType').value = "application/pdf";
+    document.getElementById('c_category').value = "檢驗科";
+    document.getElementById('c_type').value = "檢驗報告";
+    document.getElementById('c_encounter').value = "";
+    document.getElementById('c_description').value = "此為管理者端示範：FHIR 只存索引與雲端連結。";
+    document.getElementById('c_docStatus').value = "final";
+    setMsg("createMsg", "已填入範例（記得把 url 換成你自己的雲端 PDF 連結）", "ok");
+  });
+
+  document.getElementById('btnCreate').addEventListener('click', async () => {
+    try {
+      setMsg("createMsg", "建立中…", "");
+      const payload = makeDocRefPayload();
+      const url = `${base()}/DocumentReference`;
+      const data = await fhirFetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/fhir+json"
+        },
+        body: JSON.stringify(payload)
+      });
+      setMsg("createMsg", `建立成功：DocumentReference/${data.id}`, "ok");
+      // 方便接著查
+      document.getElementById('s_patientId').value = payload.subject.reference.replace("Patient/", "");
+    } catch (e) {
+      setMsg("createMsg", "建立失敗：" + e.message, "err");
+    }
+  });
+
+  // =========================
+  // 查詢（Read/Search）
+  // =========================
+  document.getElementById('btnClear').addEventListener('click', () => {
+    document.getElementById('resultBody').innerHTML = "";
+    document.getElementById('resultTable').classList.add('hidden');
+    setMsg("searchMsg", "", "");
+    closeEdit();
+  });
+
+  document.getElementById('btnSearch').addEventListener('click', async () => {
+    try {
+      const pid = document.getElementById('s_patientId').value.trim();
+      if (!pid) throw new Error("請輸入病人 ID");
+      setMsg("searchMsg", "查詢中…", "");
+      closeEdit();
+
+      const searchUrl = `${base()}/DocumentReference?subject=Patient/${encodeURIComponent(pid)}`;
+      const bundle = await fhirFetch(searchUrl);
+
+      const entries = (bundle && bundle.entry) ? bundle.entry : [];
+      if (!entries.length) {
+        document.getElementById('resultBody').innerHTML = "";
+        document.getElementById('resultTable').classList.add('hidden');
+        setMsg("searchMsg", "查不到資料（可能沒有建立過，或伺服器有權限/跨域限制）", "");
+        return;
+      }
+
+      const rows = entries.map(en => en.resource).filter(Boolean).map(r => {
+        const id = r.id || "";
+        const status = r.status || "";
+        const title = (r.content && r.content[0] && r.content[0].attachment && r.content[0].attachment.title) ? r.content[0].attachment.title : "(無標題)";
+        const url = (r.content && r.content[0] && r.content[0].attachment && r.content[0].attachment.url) ? r.content[0].attachment.url : "";
+        const typeText = r.type && r.type.text ? r.type.text : "";
+        const catText = (r.category && r.category[0] && r.category[0].text) ? r.category[0].text : "";
+        return { id, status, title, url, typeText, catText, resource: r };
+      });
+
+      const tbody = document.getElementById('resultBody');
+      tbody.innerHTML = "";
+      for (const row of rows) {
+        const tr = document.createElement('tr');
+
+        const tdId = document.createElement('td');
+        tdId.innerHTML = `<div class="mono">${escapeHtml(row.id)}</div>`;
+        tr.appendChild(tdId);
+
+        const tdInfo = document.createElement('td');
+        tdInfo.innerHTML = `
+          <div><strong>${escapeHtml(row.title)}</strong></div>
+          <div class="small">category：${escapeHtml(row.catText || "—")} ｜ type：${escapeHtml(row.typeText || "—")}</div>
+          <div class="small mono">url：${escapeHtml(row.url || "—")}</div>
+        `;
+        tr.appendChild(tdInfo);
+
+        const tdStatus = document.createElement('td');
+        tdStatus.innerHTML = `<div>${escapeHtml(row.status || "—")}</div>`;
+        tr.appendChild(tdStatus);
+
+        const tdAct = document.createElement('td');
+        const btnEdit = document.createElement('button');
+        btnEdit.textContent = "修改 metadata";
+        btnEdit.addEventListener('click', () => openEdit(row.id));
+        const btnOpen = document.createElement('button');
+        btnOpen.textContent = "開啟 PDF 連結";
+        btnOpen.addEventListener('click', () => {
+          if (!row.url) alert("這筆沒有 url");
+          else window.open(row.url, "_blank", "noopener");
+        });
+        tdAct.appendChild(btnEdit);
+        tdAct.appendChild(document.createTextNode(" "));
+        tdAct.appendChild(btnOpen);
+        tr.appendChild(tdAct);
+
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById('resultTable').classList.remove('hidden');
+      setMsg("searchMsg", `查到 ${rows.length} 筆（病人 Patient/${pid}）`, "ok");
+    } catch (e) {
+      setMsg("searchMsg", "查詢失敗：" + e.message, "err");
+    }
+  });
+
+  // =========================
+  // 修改（Update）/ 下架
+  // =========================
+  let currentDocRef = null;
+
+  async function openEdit(id) {
+    try {
+      setMsg("editMsg", "讀取中…", "");
+      document.getElementById('editBox').classList.remove('hidden');
+
+      const url = `${base()}/DocumentReference/${encodeURIComponent(id)}`;
+      const r = await fhirFetch(url);
+      currentDocRef = r;
+
+      // 填表單
+      document.getElementById('e_id').value = r.id || "";
+      document.getElementById('e_status').value = r.status || "current";
+      document.getElementById('e_subject').value = (r.subject && r.subject.reference) ? r.subject.reference : "";
+
+      const att = (r.content && r.content[0] && r.content[0].attachment) ? r.content[0].attachment : {};
+      document.getElementById('e_url').value = att.url || "";
+      document.getElementById('e_contentType').value = att.contentType || "application/pdf";
+      document.getElementById('e_title').value = att.title || "";
+
+      document.getElementById('e_type').value = (r.type && r.type.text) ? r.type.text : "";
+      document.getElementById('e_category').value = (r.category && r.category[0] && r.category[0].text) ? r.category[0].text : "";
+
+      document.getElementById('e_encounter').value =
+        (r.context && r.context.encounter && r.context.encounter[0] && r.context.encounter[0].reference)
+          ? r.context.encounter[0].reference
+          : "";
+
+      document.getElementById('e_description').value = r.description || "";
+      document.getElementById('e_docStatus').value = (r.docStatus && r.docStatus.text) ? r.docStatus.text : "";
+
+      document.getElementById('jsonPreview').textContent = JSON.stringify(r, null, 2);
+      setMsg("editMsg", "已載入，可修改後儲存。", "ok");
+    } catch (e) {
+      setMsg("editMsg", "載入失敗：" + e.message, "err");
+    }
+  }
+
+  function closeEdit() {
+    currentDocRef = null;
+    document.getElementById('editBox').classList.add('hidden');
+    setMsg("editMsg", "", "");
+    document.getElementById('jsonPreview').textContent = "";
+  }
+
+  document.getElementById('btnCloseEdit').addEventListener('click', closeEdit);
+
+  document.getElementById('btnTakeDown').addEventListener('click', async () => {
+    if (!currentDocRef) return;
+    document.getElementById('e_status').value = "entered-in-error";
+    await doUpdate("已設定為 entered-in-error（作廢/下架）");
+  });
+
+  document.getElementById('btnUpdate').addEventListener('click', async () => {
+    await doUpdate();
+  });
+
+  async function doUpdate(extraNote) {
+    try {
+      if (!currentDocRef) throw new Error("沒有載入任何 DocumentReference");
+
+      setMsg("editMsg", "更新中…", "");
+
+      // 只做 metadata 更新（依你表格）
+      const r = structuredClone(currentDocRef);
+
+      r.status = document.getElementById('e_status').value;
+
+      // subject（少用，但提供）
+      const subjectRef = document.getElementById('e_subject').value.trim();
+      if (subjectRef) r.subject = { reference: subjectRef };
+
+      // attachment
+      r.content = r.content || [{ attachment: {} }];
+      r.content[0] = r.content[0] || { attachment: {} };
+      r.content[0].attachment = r.content[0].attachment || {};
+
+      r.content[0].attachment.url = document.getElementById('e_url').value.trim();
+      r.content[0].attachment.contentType = document.getElementById('e_contentType').value.trim() || "application/pdf";
+      r.content[0].attachment.title = document.getElementById('e_title').value.trim();
+
+      // type/category
+      r.type = { text: document.getElementById('e_type').value.trim() };
+      r.category = [{ text: document.getElementById('e_category').value.trim() }];
+
+      // encounter
+      const enc = document.getElementById('e_encounter').value.trim();
+      if (enc) {
+        r.context = r.context || {};
+        r.context.encounter = [{ reference: enc }];
+      } else if (r.context && r.context.encounter) {
+        // 清掉 encounter（如果使用者清空）
+        delete r.context.encounter;
+        if (Object.keys(r.context).length === 0) delete r.context;
+      }
+
+      // description / docStatus
+      const desc = document.getElementById('e_description').value.trim();
+      if (desc) r.description = desc; else delete r.description;
+
+      const ds = document.getElementById('e_docStatus').value.trim();
+      if (ds) r.docStatus = { text: ds }; else delete r.docStatus;
+
+      // 更新 preview
+      document.getElementById('jsonPreview').textContent = JSON.stringify(r, null, 2);
+
+      // PUT 更新
+      const url = `${base()}/DocumentReference/${encodeURIComponent(r.id)}`;
+      const updated = await fhirFetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/fhir+json" },
+        body: JSON.stringify(r)
+      });
+
+      currentDocRef = updated;
+      document.getElementById('jsonPreview').textContent = JSON.stringify(updated, null, 2);
+
+      setMsg("editMsg", "更新成功。" + (extraNote ? (" " + extraNote) : ""), "ok");
+    } catch (e) {
+      setMsg("editMsg", "更新失敗：" + e.message, "err");
+    }
+  }
+
+  // =========================
+  // HTML escape（避免把資料當成 HTML）
+  // =========================
+  function escapeHtml(str) {
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+</script>
+</body>
+</html>
