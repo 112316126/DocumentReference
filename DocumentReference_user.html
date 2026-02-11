@@ -5,153 +5,284 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>DocumentReference_user.html（病人端｜檢驗科住院情境）</title>
   <style>
-    body { font-family: Arial, "Microsoft JhengHei", sans-serif; margin: 18px; line-height: 1.45; }
-    h1 { font-size: 20px; margin: 0 0 10px; }
-    h2 { font-size: 16px; margin: 18px 0 8px; }
-    .box { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin: 10px 0; }
-    .row { display: grid; grid-template-columns: 190px 1fr; gap: 10px; margin: 8px 0; align-items: center; }
-    label { color: #333; }
-    input, select, textarea, button { font: inherit; }
-    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
-    textarea { min-height: 72px; resize: vertical; }
-    button { padding: 8px 12px; border: 1px solid #444; background: #fff; border-radius: 8px; cursor: pointer; }
-    button:hover { background: #f5f5f5; }
-    .btns { display: flex; gap: 10px; flex-wrap: wrap; }
-    .hint { color: #555; font-size: 13px; }
-    .ok { color: #1f6f2a; }
-    .err { color: #a11; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; vertical-align: top; }
-    th { background: #fafafa; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
-    .small { font-size: 12px; color: #555; }
-    .hidden { display: none; }
-    .tag { display:inline-block; padding:2px 8px; border:1px solid #ddd; border-radius:999px; font-size:12px; margin-right:6px; }
+    :root{
+      --bg:#eef6ff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+      --ok:#16a34a;
+      --err:#dc2626;
+      --line:#e5e7eb;
+      --shadow: 0 10px 30px rgba(15,23,42,.10);
+      --radius: 16px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, #dbeafe 0%, var(--bg) 50%, #f8fafc 100%);
+      color:var(--text);
+      line-height:1.5;
+    }
+    .wrap{ max-width: 980px; margin: 24px auto; padding: 0 16px; }
+    .hero{
+      background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 18px 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow:hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:-120px -80px auto auto;
+      width:260px; height:260px;
+      background: rgba(255,255,255,.15);
+      border-radius: 999px;
+      transform: rotate(20deg);
+    }
+    .hero h1{ margin:0; font-size: 22px; letter-spacing:.2px; }
+    .hero p{ margin:6px 0 0; color: rgba(255,255,255,.92); font-size: 13px; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (min-width: 900px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size: 16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .badge{
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #dbeafe;
+      white-space: nowrap;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 150px 1fr;
+      gap:10px;
+      margin:10px 0;
+      align-items:center;
+    }
+    @media (max-width:520px){
+      .row{ grid-template-columns: 1fr; }
+      .row label{ margin-bottom:4px; }
+    }
+    label{ color: var(--muted); font-size: 13px; }
+    input, select{
+      width:100%;
+      padding: 10px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus, select:focus{
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 4px rgba(96,165,250,.25);
+    }
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
+    button{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #1e3a8a22;
+      cursor:pointer;
+      font-weight: 600;
+    }
+    .btn-primary{
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      color:#fff;
+      border: none;
+    }
+    .btn-primary:hover{ filter: brightness(1.02); }
+    .btn-ghost{
+      background:#fff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+    .btn-ghost:hover{ background:#eff6ff; }
+
+    .note{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .msg{
+      margin-top: 10px;
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+    .msg.ok{ border-color: #bbf7d0; background:#f0fdf4; color:#14532d; }
+    .msg.err{ border-color: #fecaca; background:#fef2f2; color:#7f1d1d; }
+
+    table{ width:100%; border-collapse:collapse; margin-top: 10px; }
+    th, td{ border-bottom: 1px solid #eef2f7; padding: 10px; text-align:left; vertical-align: top; }
+    th{ font-size: 12px; color: var(--muted); background:#f8fafc; }
+    td{ font-size: 13px; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color:#334155; }
+    .pill{
+      display:inline-block; font-size: 12px; padding:2px 8px;
+      border-radius: 999px; border:1px solid #e2e8f0; background:#fff;
+      color:#0f172a;
+      margin-right:6px;
+    }
+    .hidden{ display:none; }
   </style>
 </head>
 
 <body>
-  <h1>FHIR DocumentReference（病人端｜檢驗科住院情境）</h1>
-  <div class="hint">
-    模擬病人：<span class="mono">Patient/247119</span>（固定本人）<br>
-    檢驗報告 PDF 本體放雲端；FHIR Server 只存索引（metadata + 連結）。
-  </div>
-
-  <div class="box">
-    <h2>0) 伺服器與病人設定</h2>
-    <div class="row">
-      <label>FHIR Server Base URL</label>
-      <input id="baseUrl" value="https://hapi.fhir.tw/fhir" />
-    </div>
-    <div class="row">
-      <label>目前登入病人（固定）</label>
-      <input id="patientRef" value="Patient/247119" readonly />
-    </div>
-  </div>
-
-  <div class="box">
-    <h2>病人需填欄位（病人自行上傳）</h2>
-    <div class="hint">
-      <span class="tag">必填</span>subject(固定自己)、contentType、url、title<br>
-      <span class="tag">選填</span>category（科別）、type（文件類型）、description、attachment.creation
-    </div>
-  </div>
-
-  <div class="box">
-    <h2>1) 建立 DocumentReference（把雲端連結存進 FHIR）</h2>
-
-    <div class="row">
-      <label>subject（必填/固定自己）</label>
-      <input id="c_subject" value="Patient/247119" readonly />
+  <div class="wrap">
+    <div class="hero">
+      <h1>我的醫療文件（DocumentReference）</h1>
+      <p>住院情境範例：檢驗報告 PDF 存雲端，FHIR 只存「索引 + 連結」。為避免個資外露，本頁不顯示病人 ID。</p>
     </div>
 
-    <div class="row">
-      <label>contentType（必填/檢驗科以 PDF 為主）</label>
-      <input id="c_contentType" value="application/pdf" />
+    <div class="grid">
+      <!-- 建立 -->
+      <div class="card">
+        <h2>1) 上傳並建立索引 <span class="badge">病人端</span></h2>
+
+        <!-- subject 隱藏：不顯示、不給填 -->
+        <input type="hidden" id="patientRef" value="Patient/247119" />
+
+        <!-- contentType 固定 PDF：不給選，避免資訊過多 -->
+        <div class="row">
+          <label>文件格式</label>
+          <input id="c_contentType" value="application/pdf" readonly />
+        </div>
+
+        <div class="row">
+          <label>科別（必選）</label>
+          <select id="c_category">
+            <option value="" selected>-- 請選擇科別 --</option>
+            <option value="檢驗科">檢驗科</option>
+            <option value="內科">內科</option>
+            <option value="外科">外科</option>
+            <option value="婦產科">婦產科</option>
+            <option value="小兒科">小兒科</option>
+            <option value="骨科">骨科</option>
+            <option value="眼科">眼科</option>
+            <option value="耳鼻喉科">耳鼻喉科</option>
+            <option value="皮膚科">皮膚科</option>
+            <option value="復健科">復健科</option>
+            <option value="急診">急診</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>文件類型（必選）</label>
+          <select id="c_type">
+            <option value="" selected>-- 請選擇分類（預設為個人上傳） --</option>
+            <option value="檢驗報告 (Lab Report)">檢驗報告 (Lab Report)</option>
+            <option value="影像報告 (Imaging Report)">影像報告 (Imaging Report)</option>
+            <option value="出院摘要 (Discharge Summary)">出院摘要 (Discharge Summary)</option>
+            <option value="門診紀錄 (Clinical Note)">門診紀錄 (Clinical Note)</option>
+            <option value="診斷證明書 (Certificate)">診斷證明書 (Certificate)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>雲端檔案連結 URL（必填）</label>
+          <input id="c_url" placeholder="例如：https://.../report.pdf" />
+        </div>
+
+        <div class="row">
+          <label>文件標題（必填）</label>
+          <input id="c_title" placeholder="例如：住院第2天血液檢驗報告" />
+        </div>
+
+        <div class="note">
+          建立索引時，系統會自動加入「當前時間」作為檔案產生時間（attachment.creation）。
+        </div>
+
+        <div class="btns">
+          <button class="btn-primary" id="btnCreate">建立索引並保存</button>
+          <button class="btn-ghost" id="btnDemo">快速填入範例</button>
+        </div>
+
+        <div id="createMsg" class="msg hidden"></div>
+      </div>
+
+      <!-- 查詢 -->
+      <div class="card">
+        <h2>2) 查詢我的醫療文件 <span class="badge">僅本人</span></h2>
+        <div class="note">
+          本頁只查詢自己的文件（subject 固定為本人，不顯示 ID）。<br>
+          清單會顯示：標題 / 科別 / 文件類型 / 雲端連結。
+        </div>
+
+        <div class="btns">
+          <button class="btn-primary" id="btnSearch">查詢我的文件清單</button>
+          <button class="btn-ghost" id="btnClear">清空結果</button>
+        </div>
+
+        <div id="searchMsg" class="msg hidden"></div>
+
+        <table id="resultTable" class="hidden">
+          <thead>
+            <tr>
+              <th style="width:120px;">DocRef ID</th>
+              <th>標題 / 科別 / 文件類型</th>
+              <th style="width:190px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </div>
     </div>
-
-    <div class="row">
-      <label>雲端檔案連結 url（必填）</label>
-      <input id="c_url" placeholder="例如：https://.../lab-report.pdf" />
-    </div>
-
-    <div class="row">
-      <label>文件標題 title（必填）</label>
-      <input id="c_title" placeholder="例如：我的檢驗報告（住院第2天）" />
-    </div>
-
-    <div class="row">
-      <label>科別 category（選填｜你要求要能填科別）</label>
-      <input id="c_category" value="檢驗科" />
-    </div>
-
-    <div class="row">
-      <label>文件類型 type（選填）</label>
-      <input id="c_type" value="檢驗報告" />
-    </div>
-
-    <div class="row">
-      <label>description（選填）</label>
-      <textarea id="c_description" placeholder="例如：住院期間抽血檢驗報告"></textarea>
-    </div>
-
-    <div class="row">
-      <label>檔案產生時間 creation（選填）</label>
-      <input id="c_creation" placeholder="例如：2026-01-24T10:30:00+08:00（可留空）" />
-    </div>
-
-    <div class="btns">
-      <button id="btnCreate">建立索引（POST DocumentReference）</button>
-      <button id="btnDemo">快速填入範例</button>
-    </div>
-
-    <div id="createMsg" class="small"></div>
-  </div>
-
-  <div class="box">
-    <h2>2) 查詢我的文件（僅限本人）</h2>
-
-    <div class="btns">
-      <button id="btnSearch">查詢（GET DocumentReference?subject=Patient/247119）</button>
-      <button id="btnClear">清空結果</button>
-    </div>
-
-    <div class="hint">
-      只查自己：<span class="mono">subject = Patient/247119</span><br>
-      清單顯示「科別 category」與「文件類型 type」，模擬你表格說的依科別顯示。
-    </div>
-
-    <div id="searchMsg" class="small"></div>
-
-    <table id="resultTable" class="hidden">
-      <thead>
-        <tr>
-          <th style="width:120px;">DocRef ID</th>
-          <th>標題 / 科別 / 類型</th>
-          <th style="width:210px;">操作</th>
-        </tr>
-      </thead>
-      <tbody id="resultBody"></tbody>
-    </table>
   </div>
 
 <script>
-  // ========= helpers =========
-  function base() { return document.getElementById('baseUrl').value.replace(/\/+$/, ''); }
-    function patientRef() { return document.getElementById('patientRef').value.trim() || "Patient/247119"; }
-  function setMsg(elId, text, type) {
+  // ===== 基本設定 =====
+  const BASE_URL = "https://hapi.fhir.tw/fhir"; // 你也可以改成動態輸入，但老師說資訊太多，這裡固定
+  function patientRef(){ return document.getElementById('patientRef').value.trim(); }
+
+  function showMsg(elId, text, type){
     const el = document.getElementById(elId);
-    el.className = "small " + (type === "ok" ? "ok" : type === "err" ? "err" : "");
-    el.textContent = text || "";
+    el.classList.remove("hidden");
+    el.classList.remove("ok","err");
+    if(type) el.classList.add(type);
+    el.textContent = text;
   }
-  async function fhirFetch(url, options = {}) {
-    const headers = Object.assign({ "Accept": "application/fhir+json" }, options.headers || {});
+  function hideMsg(elId){
+    const el = document.getElementById(elId);
+    el.classList.add("hidden");
+    el.textContent = "";
+    el.classList.remove("ok","err");
+  }
+  async function fhirFetch(url, options = {}){
+    const headers = Object.assign({ "Accept":"application/fhir+json" }, options.headers || {});
     const res = await fetch(url, Object.assign({}, options, { headers }));
     let data = null;
     const ct = res.headers.get("content-type") || "";
-    if (ct.includes("json")) data = await res.json().catch(() => null);
+    if(ct.includes("json")) data = await res.json().catch(() => null);
     else data = await res.text().catch(() => null);
-    if (!res.ok) {
+
+    if(!res.ok){
       const msg = (data && data.issue && data.issue[0] && data.issue[0].diagnostics)
         ? data.issue[0].diagnostics
         : (typeof data === "string" ? data : "");
@@ -159,113 +290,99 @@
     }
     return data;
   }
-  function escapeHtml(str) {
+  function escapeHtml(str){
     return String(str || "")
-      .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;").replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
   }
 
-  // ========= create =========
-  function makePayload() {
-    const subject = patientRef(); // 固定本人
-    const contentType = document.getElementById('c_contentType').value.trim() || "application/pdf";
-    const url = document.getElementById('c_url').value.trim();
-    const title = document.getElementById('c_title').value.trim();
+  // ===== 建立 payload（重點：subject 隱藏、description 移除、creation 自動當前時間） =====
+  function makePayload(){
+    const contentType = "application/pdf"; // 固定
     const category = document.getElementById('c_category').value.trim();
     const type = document.getElementById('c_type').value.trim();
-    const description = document.getElementById('c_description').value.trim();
-    const creation = document.getElementById('c_creation').value.trim();
+    const url = document.getElementById('c_url').value.trim();
+    const title = document.getElementById('c_title').value.trim();
 
-    if (!contentType) throw new Error("contentType 必填");
-    if (!url) throw new Error("url（雲端連結）必填");
-    if (!title) throw new Error("title 必填");
+    if(!category) throw new Error("請選擇科別");
+    if(!type) throw new Error("請選擇文件類型");
+    if(!url) throw new Error("請填寫雲端檔案連結 URL");
+    if(!title) throw new Error("請填寫文件標題");
 
-    const now = new Date().toISOString();
+    const nowISO = new Date().toISOString();
 
-    const payload = {
+    return {
       resourceType: "DocumentReference",
       status: "current",
-      subject: { reference: subject },
-      date: now,
+      subject: { reference: patientRef() },   // 不顯示，但會送出
+      date: nowISO,
+      category: [{ text: category }],
+      type: { text: type },
       content: [{
         attachment: {
           contentType: contentType,
           url: url,
-          title: title
+          title: title,
+          creation: nowISO   // 自動加入當前時間
         }
       }]
     };
-
-    // 病人端允許自己填分類（選填）
-    if (category) payload.category = [{ text: category }];
-    if (type) payload.type = { text: type };
-    if (description) payload.description = description;
-    if (creation) payload.content[0].attachment.creation = creation;
-
-    return payload;
   }
 
+  // ===== 快速範例 =====
   document.getElementById('btnDemo').addEventListener('click', () => {
-    document.getElementById('c_contentType').value = "application/pdf";
-    document.getElementById('c_url').value = "https://example.com/my-lab-report.pdf";
-    document.getElementById('c_title').value = "住院抽血檢驗報告（示例）";
     document.getElementById('c_category').value = "檢驗科";
-    document.getElementById('c_type').value = "檢驗報告";
-    document.getElementById('c_description').value = "住院期間抽血檢驗，病人自行上傳保存。";
-    document.getElementById('c_creation').value = "";
-    setMsg("createMsg", "已填入範例（記得把 url 換成你自己的雲端 PDF 連結）", "ok");
+    document.getElementById('c_type').value = "檢驗報告 (Lab Report)";
+    document.getElementById('c_url').value = "https://example.com/lab-report.pdf";
+    document.getElementById('c_title').value = "住院抽血檢驗報告（示例）";
+    showMsg("createMsg", "已填入範例（記得把 URL 換成你自己的雲端 PDF 連結）", "ok");
   });
 
+  // ===== 建立索引 =====
   document.getElementById('btnCreate').addEventListener('click', async () => {
-    try {
-      setMsg("createMsg", "建立中…", "");
+    try{
+      hideMsg("createMsg");
       const payload = makePayload();
-      const data = await fhirFetch(`${base()}/DocumentReference`, {
+      showMsg("createMsg", "建立中…", "");
+      const data = await fhirFetch(`${BASE_URL}/DocumentReference`, {
         method: "POST",
-        headers: { "Content-Type": "application/fhir+json" },
+        headers: { "Content-Type":"application/fhir+json" },
         body: JSON.stringify(payload)
       });
-      setMsg("createMsg", `建立成功：DocumentReference/${data.id}`, "ok");
-    } catch (e) {
-      setMsg("createMsg", "建立失敗：" + e.message, "err");
+      showMsg("createMsg", `建立成功 ✅ DocumentReference/${data.id}`, "ok");
+    }catch(e){
+      showMsg("createMsg", "建立失敗 ❌ " + e.message, "err");
     }
   });
 
-  // ========= search =========
-  document.getElementById('btnClear').addEventListener('click', () => {
-    document.getElementById('resultBody').innerHTML = "";
-    document.getElementById('resultTable').classList.add('hidden');
-    setMsg("searchMsg", "", "");
-  });
-
+  // ===== 查詢我的文件 =====
   document.getElementById('btnSearch').addEventListener('click', async () => {
-    try {
-      setMsg("searchMsg", "查詢中…", "");
-      const subject = patientRef();
-      const bundle = await fhirFetch(`${base()}/DocumentReference?subject=${encodeURIComponent(subject)}`);
-
+    try{
+      hideMsg("searchMsg");
+      showMsg("searchMsg", "查詢中…", "");
+      const bundle = await fhirFetch(`${BASE_URL}/DocumentReference?subject=${encodeURIComponent(patientRef())}`);
       const entries = (bundle && bundle.entry) ? bundle.entry : [];
-      if (!entries.length) {
-        document.getElementById('resultBody').innerHTML = "";
-        document.getElementById('resultTable').classList.add('hidden');
-        setMsg("searchMsg", "目前沒有任何文件索引（先建立一筆試試看）", "");
-        return;
-      }
-
       const docs = entries.map(e => e.resource).filter(Boolean);
 
       const tbody = document.getElementById('resultBody');
       tbody.innerHTML = "";
 
-      for (const r of docs) {
+      if(!docs.length){
+        document.getElementById('resultTable').classList.add("hidden");
+        showMsg("searchMsg", "目前沒有任何文件索引（請先建立一筆）", "");
+        return;
+      }
+
+      for(const r of docs){
         const id = r.id || "";
+        const cat = (r.category && r.category[0] && r.category[0].text) ? r.category[0].text : "—";
+        const type = (r.type && r.type.text) ? r.type.text : "—";
         const att = (r.content && r.content[0] && r.content[0].attachment) ? r.content[0].attachment : {};
         const title = att.title || "(無標題)";
         const url = att.url || "";
-        const contentType = att.contentType || "";
-        const cat = (r.category && r.category[0] && r.category[0].text) ? r.category[0].text : "—";
-        const type = (r.type && r.type.text) ? r.type.text : "—";
 
         const tr = document.createElement('tr');
 
@@ -276,31 +393,37 @@
         const tdInfo = document.createElement('td');
         tdInfo.innerHTML = `
           <div><strong>${escapeHtml(title)}</strong></div>
-          <div class="small">科別 category：${escapeHtml(cat)} ｜ 類型 type：${escapeHtml(type)}</div>
-          <div class="small">格式 contentType：${escapeHtml(contentType || "—")}</div>
-          <div class="small mono">url：${escapeHtml(url || "—")}</div>
+          <div class="note"><span class="pill">${escapeHtml(cat)}</span><span class="pill">${escapeHtml(type)}</span></div>
+          <div class="mono">${escapeHtml(url || "—")}</div>
         `;
         tr.appendChild(tdInfo);
 
         const tdAct = document.createElement('td');
         const btnOpen = document.createElement('button');
+        btnOpen.className = "btn-ghost";
         btnOpen.textContent = "開啟 PDF 連結";
         btnOpen.addEventListener('click', () => {
-          if (!url) alert("這筆沒有 url");
+          if(!url) alert("這筆沒有 URL");
           else window.open(url, "_blank", "noopener");
         });
-
         tdAct.appendChild(btnOpen);
         tr.appendChild(tdAct);
 
         tbody.appendChild(tr);
       }
 
-      document.getElementById('resultTable').classList.remove('hidden');
-      setMsg("searchMsg", `查到 ${docs.length} 筆（僅限本人 ${subject}）`, "ok");
-    } catch (e) {
-      setMsg("searchMsg", "查詢失敗：" + e.message, "err");
+      document.getElementById('resultTable').classList.remove("hidden");
+      showMsg("searchMsg", `查詢成功 ✅ 共 ${docs.length} 筆`, "ok");
+    }catch(e){
+      showMsg("searchMsg", "查詢失敗 ❌ " + e.message, "err");
     }
+  });
+
+  // ===== 清空 =====
+  document.getElementById('btnClear').addEventListener('click', () => {
+    hideMsg("searchMsg");
+    document.getElementById('resultBody').innerHTML = "";
+    document.getElementById('resultTable').classList.add("hidden");
   });
 </script>
 </body>
