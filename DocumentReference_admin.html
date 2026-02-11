@@ -3,543 +3,821 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>DocumentReference_admin.html（檢驗科｜管理者端）</title>
+  <title>DocumentReference_admin.html（管理者端｜Policy A）</title>
   <style>
-    body { font-family: Arial, "Microsoft JhengHei", sans-serif; margin: 18px; line-height: 1.45; }
-    h1 { font-size: 20px; margin: 0 0 10px; }
-    h2 { font-size: 16px; margin: 18px 0 8px; }
-    .box { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin: 10px 0; }
-    .row { display: grid; grid-template-columns: 180px 1fr; gap: 10px; margin: 8px 0; align-items: center; }
-    label { color: #333; }
-    input, select, textarea, button { font: inherit; }
-    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
-    textarea { min-height: 72px; resize: vertical; }
-    button { padding: 8px 12px; border: 1px solid #444; background: #fff; border-radius: 8px; cursor: pointer; }
-    button:hover { background: #f5f5f5; }
-    .btns { display: flex; gap: 10px; flex-wrap: wrap; }
-    .hint { color: #555; font-size: 13px; }
-    .warn { color: #8a3b00; font-size: 13px; }
-    .ok { color: #1f6f2a; }
-    .err { color: #a11; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; vertical-align: top; }
-    th { background: #fafafa; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
-    .small { font-size: 12px; color: #555; }
-    .divider { height: 1px; background: #eee; margin: 12px 0; }
-    .hidden { display: none; }
+    :root{
+      --bg:#eef6ff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --primary:#7c3aed;
+      --primary2:#5b21b6;
+      --ok:#16a34a;
+      --err:#dc2626;
+      --line:#e5e7eb;
+      --shadow: 0 10px 30px rgba(15,23,42,.10);
+      --radius: 16px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, #ede9fe 0%, var(--bg) 50%, #f8fafc 100%);
+      color:var(--text);
+      line-height:1.5;
+    }
+    .wrap{ max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    .hero{
+      background: linear-gradient(135deg, #5b21b6, #a855f7);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 18px 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow:hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:-120px -80px auto auto;
+      width:260px; height:260px;
+      background: rgba(255,255,255,.15);
+      border-radius: 999px;
+      transform: rotate(20deg);
+    }
+    .hero h1{ margin:0; font-size: 22px; letter-spacing:.2px; }
+    .hero p{ margin:6px 0 0; color: rgba(255,255,255,.92); font-size: 13px; }
+
+    .topbar{
+      margin-top: 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      flex-wrap: wrap;
+    }
+    .who{
+      color: rgba(255,255,255,.95);
+      font-size: 13px;
+    }
+    .deptBox{
+      display:flex; align-items:center; gap:8px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      padding: 8px 10px;
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+    }
+    .deptBox label{ color: rgba(255,255,255,.95); font-size: 12px; }
+    .deptBox select{
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.92);
+      color: #0f172a;
+      font-weight: 800;
+      outline: none;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (min-width: 980px){
+      .grid{ grid-template-columns: 1fr 1.3fr; }
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size: 16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .badge{
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #f5f3ff;
+      color: #5b21b6;
+      border: 1px solid #ddd6fe;
+      white-space: nowrap;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 170px 1fr;
+      gap:10px;
+      margin:10px 0;
+      align-items:center;
+    }
+    @media (max-width:520px){
+      .row{ grid-template-columns: 1fr; }
+    }
+    label{ color: var(--muted); font-size: 13px; }
+    input, select, textarea{
+      width:100%;
+      padding: 10px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+    }
+    textarea{ min-height: 76px; resize: vertical; }
+    input:focus, select:focus, textarea:focus{
+      border-color: #c4b5fd;
+      box-shadow: 0 0 0 4px rgba(196,181,253,.30);
+    }
+
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
+    button{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #5b21b622;
+      cursor:pointer;
+      font-weight: 800;
+    }
+    .btn-primary{
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      color:#fff;
+      border: none;
+    }
+    .btn-primary:hover{ filter: brightness(1.02); }
+    .btn-ghost{
+      background:#fff;
+      color:#5b21b6;
+      border:1px solid #ddd6fe;
+    }
+    .btn-ghost:hover{ background:#f5f3ff; }
+    .btn-danger{
+      background: #fff;
+      color:#b91c1c;
+      border:1px solid #fecaca;
+    }
+    .btn-danger:hover{ background:#fef2f2; }
+
+    .note{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .msg{
+      margin-top: 10px;
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+    .msg.ok{ border-color: #bbf7d0; background:#f0fdf4; color:#14532d; }
+    .msg.err{ border-color: #fecaca; background:#fef2f2; color:#7f1d1d; }
+    .hidden{ display:none; }
+
+    table{ width:100%; border-collapse:collapse; margin-top: 10px; }
+    th, td{ border-bottom: 1px solid #eef2f7; padding: 10px; text-align:left; vertical-align: top; }
+    th{ font-size: 12px; color: var(--muted); background:#f8fafc; }
+    td{ font-size: 13px; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color:#334155; }
+    .pill{
+      display:inline-block; font-size: 12px; padding:2px 8px;
+      border-radius: 999px; border:1px solid #e2e8f0; background:#fff;
+      color:#0f172a;
+      margin-right:6px;
+    }
+
+    .modalBack{
+      position: fixed; inset: 0;
+      background: rgba(2,6,23,.55);
+      display:none;
+      align-items:center; justify-content:center;
+      padding: 18px;
+    }
+    .modal{
+      width:min(760px, 100%);
+      background:#fff;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 18px 60px rgba(2,6,23,.35);
+      overflow:hidden;
+    }
+    .modalHead{
+      padding: 14px 14px;
+      background: linear-gradient(135deg, #5b21b6, #a855f7);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .modalHead h3{ margin:0; font-size: 16px; }
+    .modalBody{ padding: 14px; }
+    .xbtn{
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      color:#fff;
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+      font-weight: 900;
+    }
+    .xbtn:hover{ background: rgba(255,255,255,.22); }
   </style>
 </head>
 
 <body>
-  <h1>FHIR DocumentReference（檢驗科｜管理者端 Admin/IT）</h1>
-  <div class="hint">
-    模擬情境：檢驗報告 PDF 本體放雲端；FHIR Server 只存索引（metadata + 連結）。
+  <div class="wrap">
+    <div class="hero">
+      <h1>管理者端｜DocumentReference（Policy A：只看索引，不看內容）</h1>
+      <p>管理者可修正 metadata 與下架索引（status=entered-in-error），但不提供開啟 PDF 連結，避免接觸醫療內容。</p>
+
+      <div class="topbar">
+        <div class="who">目前模式：<strong>Admin / IT</strong>｜文件：<strong>PDF</strong></div>
+
+        <div class="deptBox">
+          <label for="deptFilter">科別過濾（Demo）</label>
+          <select id="deptFilter">
+            <option value="" selected>全部</option>
+            <option value="檢驗科">檢驗科</option>
+            <option value="內科">內科</option>
+            <option value="外科">外科</option>
+            <option value="婦產科">婦產科</option>
+            <option value="小兒科">小兒科</option>
+            <option value="骨科">骨科</option>
+            <option value="眼科">眼科</option>
+            <option value="耳鼻喉科">耳鼻喉科</option>
+            <option value="皮膚科">皮膚科</option>
+            <option value="復健科">復健科</option>
+            <option value="急診">急診</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- 建檔（例外/測試） -->
+      <div class="card">
+        <h2>1) 建立索引（例外處理/測試用） <span class="badge">Create</span></h2>
+
+        <div class="row">
+          <label>病人 ID（必填）</label>
+          <input id="c_patientId" placeholder="例如：247119" />
+        </div>
+
+        <div class="row">
+          <label>科別 category（必選）</label>
+          <select id="c_category">
+            <option value="" selected>-- 請選擇科別 --</option>
+            <option value="檢驗科">檢驗科</option>
+            <option value="內科">內科</option>
+            <option value="外科">外科</option>
+            <option value="婦產科">婦產科</option>
+            <option value="小兒科">小兒科</option>
+            <option value="骨科">骨科</option>
+            <option value="眼科">眼科</option>
+            <option value="耳鼻喉科">耳鼻喉科</option>
+            <option value="皮膚科">皮膚科</option>
+            <option value="復健科">復健科</option>
+            <option value="急診">急診</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>文件類型 type（必選）</label>
+          <select id="c_type">
+            <option value="" selected>-- 請選擇分類 --</option>
+            <option value="檢驗報告 (Lab Report)">檢驗報告 (Lab Report)</option>
+            <option value="影像報告 (Imaging Report)">影像報告 (Imaging Report)</option>
+            <option value="出院摘要 (Discharge Summary)">出院摘要 (Discharge Summary)</option>
+            <option value="門診紀錄 (Clinical Note)">門診紀錄 (Clinical Note)</option>
+            <option value="診斷證明書 (Certificate)">診斷證明書 (Certificate)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>雲端 PDF 連結（必填）</label>
+          <input id="c_url" placeholder="例如：https://.../report.pdf" />
+        </div>
+
+        <div class="row">
+          <label>文件標題（必填）</label>
+          <input id="c_title" placeholder="例如：系統補建索引（示例）" />
+        </div>
+
+        <div class="row">
+          <label>status（索引狀態）</label>
+          <select id="c_status">
+            <option value="current" selected>current（正常）</option>
+            <option value="entered-in-error">entered-in-error（作廢/下架）</option>
+          </select>
+        </div>
+
+        <div class="note">
+          管理者建檔用於「例外修正/測試」；內容仍為 PDF 連結，FHIR 只存索引。
+        </div>
+
+        <div class="btns">
+          <button class="btn-primary" id="btnCreate">建立索引</button>
+          <button class="btn-ghost" id="btnDemo">快速填入範例</button>
+        </div>
+
+        <div id="createMsg" class="msg hidden"></div>
+      </div>
+
+      <!-- 查詢與管理 -->
+      <div class="card">
+        <h2>2) 索引管理（查詢 / 修正 / 下架） <span class="badge">Read / Update / Deactivate</span></h2>
+
+        <div class="row">
+          <label>病人 ID</label>
+          <input id="s_patientId" placeholder="例如：247119" />
+        </div>
+
+        <div class="btns">
+          <button class="btn-primary" id="btnSearch">查詢</button>
+          <button class="btn-ghost" id="btnClear">清空</button>
+        </div>
+
+        <div class="note">
+          Policy A：管理者<strong>不提供開啟 PDF</strong>，只做索引管理（修 metadata / 下架）。<br>
+          Demo：可用上方「科別過濾」切換顯示。
+        </div>
+
+        <div id="searchMsg" class="msg hidden"></div>
+
+        <table id="resultTable" class="hidden">
+          <thead>
+            <tr>
+              <th style="width:120px;">DocRef ID</th>
+              <th>標題 / 科別 / 類型 / status</th>
+              <th style="width:320px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <div class="box">
-    <h2>0) 伺服器設定</h2>
-    <div class="row">
-      <label>FHIR Server Base URL</label>
-      <input id="baseUrl" value="https://hapi.fhir.tw/fhir" />
+  <!-- 修 metadata Modal -->
+  <div class="modalBack" id="modalBack">
+    <div class="modal">
+      <div class="modalHead">
+        <h3>例外修正（僅 metadata）</h3>
+        <button class="xbtn" id="btnCloseModal">關閉</button>
+      </div>
+      <div class="modalBody">
+        <div class="note">
+          僅修正索引資料：status / title / url / contentType / type / category / description / docStatus。<br>
+          不涉及「醫療內容本體」。
+        </div>
+
+        <div class="row">
+          <label>DocRef ID</label>
+          <input id="e_id" readonly />
+        </div>
+
+        <div class="row">
+          <label>status</label>
+          <select id="e_status">
+            <option value="current">current（正常）</option>
+            <option value="entered-in-error">entered-in-error（作廢/下架）</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>文件標題 title</label>
+          <input id="e_title" />
+        </div>
+
+        <div class="row">
+          <label>雲端連結 url</label>
+          <input id="e_url" />
+        </div>
+
+        <div class="row">
+          <label>contentType</label>
+          <input id="e_contentType" value="application/pdf" />
+        </div>
+
+        <div class="row">
+          <label>科別 category</label>
+          <select id="e_category">
+            <option value="">（清空/不填）</option>
+            <option value="檢驗科">檢驗科</option>
+            <option value="內科">內科</option>
+            <option value="外科">外科</option>
+            <option value="婦產科">婦產科</option>
+            <option value="小兒科">小兒科</option>
+            <option value="骨科">骨科</option>
+            <option value="眼科">眼科</option>
+            <option value="耳鼻喉科">耳鼻喉科</option>
+            <option value="皮膚科">皮膚科</option>
+            <option value="復健科">復健科</option>
+            <option value="急診">急診</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>文件類型 type</label>
+          <select id="e_type">
+            <option value="">（清空/不填）</option>
+            <option value="檢驗報告 (Lab Report)">檢驗報告 (Lab Report)</option>
+            <option value="影像報告 (Imaging Report)">影像報告 (Imaging Report)</option>
+            <option value="出院摘要 (Discharge Summary)">出院摘要 (Discharge Summary)</option>
+            <option value="門診紀錄 (Clinical Note)">門診紀錄 (Clinical Note)</option>
+            <option value="診斷證明書 (Certificate)">診斷證明書 (Certificate)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>docStatus</label>
+          <select id="e_docStatus">
+            <option value="">（清空/不填）</option>
+            <option value="preliminary">preliminary</option>
+            <option value="final">final</option>
+            <option value="amended">amended</option>
+            <option value="entered-in-error">entered-in-error</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>description（可選）</label>
+          <textarea id="e_description" placeholder="例：metadata 註記/修正原因"></textarea>
+        </div>
+
+        <div class="btns">
+          <button class="btn-primary" id="btnSaveMeta">儲存修正</button>
+          <button class="btn-danger" id="btnDeactivate">一鍵下架（status=entered-in-error）</button>
+        </div>
+
+        <div id="editMsg" class="msg hidden"></div>
+
+        <details style="margin-top:10px;">
+          <summary class="note">查看目前資源 JSON（debug）</summary>
+          <pre id="jsonPreview" class="mono" style="white-space:pre-wrap;"></pre>
+        </details>
+      </div>
     </div>
-    <div class="hint">如果你們之後換成自己的 HAPI Server，只要改這裡。</div>
-  </div>
-
-  <div class="box">
-    <h2>1) 建立 DocumentReference（建立索引）</h2>
-
-    <div class="row">
-      <label>病人 ID（必填）</label>
-      <input id="c_patientId" placeholder="例如：1326" />
-    </div>
-
-    <div class="row">
-      <label>報告標題 title（必填）</label>
-      <input id="c_title" placeholder="例如：血液檢驗報告（CBC）" />
-    </div>
-
-    <div class="row">
-      <label>雲端 PDF 連結 url（必填）</label>
-      <input id="c_url" placeholder="例如：https://.../report.pdf" />
-    </div>
-
-    <div class="row">
-      <label>檔案格式 contentType（固定）</label>
-      <input id="c_contentType" value="application/pdf" />
-    </div>
-
-    <div class="row">
-      <label>科別 category（固定/建議）</label>
-      <input id="c_category" value="檢驗科" />
-    </div>
-
-    <div class="row">
-      <label>文件類型 type（固定/建議）</label>
-      <input id="c_type" value="檢驗報告" />
-    </div>
-
-    <div class="row">
-      <label>就診/住院 Encounter（選填）</label>
-      <input id="c_encounter" placeholder="例如：Encounter/123（可留空）" />
-    </div>
-
-    <div class="row">
-      <label>備註 description（選填）</label>
-      <textarea id="c_description" placeholder="例如：此索引為檢驗科上傳；檔案本體在雲端"></textarea>
-    </div>
-
-    <div class="row">
-      <label>文件狀態 docStatus（選填）</label>
-      <input id="c_docStatus" placeholder="例如：final / preliminary（可留空）" />
-    </div>
-
-    <div class="btns">
-      <button id="btnCreate">建立索引（POST DocumentReference）</button>
-      <button id="btnCreateDemo">快速填入範例</button>
-    </div>
-
-    <div id="createMsg" class="small"></div>
-  </div>
-
-  <div class="box">
-    <h2>2) 依病人查詢 DocumentReference（看清單）</h2>
-
-    <div class="row">
-      <label>病人 ID</label>
-      <input id="s_patientId" placeholder="例如：1326" />
-    </div>
-
-    <div class="btns">
-      <button id="btnSearch">查詢（GET DocumentReference?subject=Patient/{id}）</button>
-      <button id="btnClear">清空結果</button>
-    </div>
-
-    <div id="searchMsg" class="small"></div>
-
-    <table id="resultTable" class="hidden">
-      <thead>
-        <tr>
-          <th style="width:120px;">DocRef ID</th>
-          <th>標題 / 分類</th>
-          <th style="width:200px;">狀態</th>
-          <th style="width:210px;">操作</th>
-        </tr>
-      </thead>
-      <tbody id="resultBody"></tbody>
-    </table>
-  </div>
-
-  <div class="box hidden" id="editBox">
-    <h2>3) 修改 DocumentReference（僅限 metadata｜含下架/作廢）</h2>
-    <div class="warn">
-      管理者主要修改：status（下架/作廢）、url（連結失效替換）、title、contentType、type/category、subject（少用）、encounter、description/docStatus。
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="row">
-      <label>DocRef ID</label>
-      <input id="e_id" readonly />
-    </div>
-
-    <div class="row">
-      <label>status（下架/作廢用）</label>
-      <select id="e_status">
-        <option value="current">current（正常）</option>
-        <option value="superseded">superseded（被新版取代）</option>
-        <option value="entered-in-error">entered-in-error（作廢/錯誤）</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <label>病人 subject（少用）</label>
-      <input id="e_subject" placeholder="例如：Patient/1326" />
-    </div>
-
-    <div class="row">
-      <label>雲端連結 content.attachment.url</label>
-      <input id="e_url" />
-    </div>
-
-    <div class="row">
-      <label>contentType</label>
-      <input id="e_contentType" value="application/pdf" />
-    </div>
-
-    <div class="row">
-      <label>title</label>
-      <input id="e_title" />
-    </div>
-
-    <div class="row">
-      <label>type（文件類型）</label>
-      <input id="e_type" />
-    </div>
-
-    <div class="row">
-      <label>category（科別）</label>
-      <input id="e_category" />
-    </div>
-
-    <div class="row">
-      <label>context.encounter（選填）</label>
-      <input id="e_encounter" placeholder="例如：Encounter/123（可留空）" />
-    </div>
-
-    <div class="row">
-      <label>description</label>
-      <textarea id="e_description"></textarea>
-    </div>
-
-    <div class="row">
-      <label>docStatus</label>
-      <input id="e_docStatus" placeholder="例如：final" />
-    </div>
-
-    <div class="btns">
-      <button id="btnUpdate">儲存修改（PUT DocumentReference/{id}）</button>
-      <button id="btnTakeDown">一鍵下架（status = entered-in-error）</button>
-      <button id="btnCloseEdit">關閉</button>
-    </div>
-
-    <div id="editMsg" class="small"></div>
-
-    <details style="margin-top:10px;">
-      <summary>查看目前資源 JSON（debug）</summary>
-      <pre id="jsonPreview" class="mono"></pre>
-    </details>
   </div>
 
 <script>
-  // =========================
-  // 小工具
-  // =========================
-  function base() {
-    return document.getElementById('baseUrl').value.replace(/\/+$/, '');
-  }
-  function setMsg(elId, text, type) {
+  const BASE_URL = "https://hapi.fhir.tw/fhir";
+
+  function deptFilter(){ return document.getElementById('deptFilter').value.trim(); }
+
+  function showMsg(elId, text, type){
     const el = document.getElementById(elId);
-    el.className = "small " + (type === "ok" ? "ok" : type === "err" ? "err" : "");
-    el.textContent = text || "";
+    el.classList.remove("hidden");
+    el.classList.remove("ok","err");
+    if(type) el.classList.add(type);
+    el.textContent = text;
   }
-  async function fhirFetch(url, options = {}) {
-    const headers = Object.assign({
-      "Accept": "application/fhir+json",
-    }, options.headers || {});
+  function hideMsg(elId){
+    const el = document.getElementById(elId);
+    el.classList.add("hidden");
+    el.textContent = "";
+    el.classList.remove("ok","err");
+  }
+
+  async function fhirFetch(url, options = {}){
+    const headers = Object.assign({ "Accept":"application/fhir+json" }, options.headers || {});
     const res = await fetch(url, Object.assign({}, options, { headers }));
     let data = null;
     const ct = res.headers.get("content-type") || "";
-    if (ct.includes("json")) {
-      data = await res.json().catch(() => null);
-    } else {
-      data = await res.text().catch(() => null);
-    }
-    if (!res.ok) {
-      const msg = (data && data.issue && data.issue[0] && data.issue[0].diagnostics) ? data.issue[0].diagnostics : (typeof data === "string" ? data : "");
+    if(ct.includes("json")) data = await res.json().catch(() => null);
+    else data = await res.text().catch(() => null);
+
+    if(!res.ok){
+      const msg = (data && data.issue && data.issue[0] && data.issue[0].diagnostics)
+        ? data.issue[0].diagnostics
+        : (typeof data === "string" ? data : "");
       throw new Error(`HTTP ${res.status} ${res.statusText}${msg ? " - " + msg : ""}`);
     }
     return data;
   }
 
-  function makeDocRefPayload() {
-    const patientId = document.getElementById('c_patientId').value.trim();
-    const title = document.getElementById('c_title').value.trim();
+  function escapeHtml(str){
+    return String(str || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function getTextFromCodeable(x){
+    if(!x) return "";
+    if(x.text) return x.text;
+    if(x.coding && x.coding[0] && x.coding[0].display) return x.coding[0].display;
+    if(x.coding && x.coding[0] && x.coding[0].code) return x.coding[0].code;
+    return "";
+  }
+  function getCategoryText(r){
+    return (r.category && r.category[0] && r.category[0].text) ? r.category[0].text : "";
+  }
+  function getTypeText(r){
+    return getTextFromCodeable(r.type);
+  }
+  function getDocStatusCode(r){
+    const ds = r.docStatus;
+    if(!ds) return "";
+    if(ds.coding && ds.coding[0] && ds.coding[0].code) return ds.coding[0].code;
+    if(ds.text) return ds.text;
+    return "";
+  }
+
+  // ===== Create =====
+  function makeCreatePayload(){
+    const pid = document.getElementById('c_patientId').value.trim();
+    const cat = document.getElementById('c_category').value.trim();
+    const type = document.getElementById('c_type').value.trim();
     const url = document.getElementById('c_url').value.trim();
-    const contentType = document.getElementById('c_contentType').value.trim() || "application/pdf";
-    const category = document.getElementById('c_category').value.trim() || "檢驗科";
-    const type = document.getElementById('c_type').value.trim() || "檢驗報告";
-    const encounter = document.getElementById('c_encounter').value.trim();
-    const description = document.getElementById('c_description').value.trim();
-    const docStatus = document.getElementById('c_docStatus').value.trim();
+    const title = document.getElementById('c_title').value.trim();
+    const status = document.getElementById('c_status').value.trim() || "current";
 
-    if (!patientId) throw new Error("病人 ID 必填");
-    if (!title) throw new Error("title 必填");
-    if (!url) throw new Error("雲端 PDF 連結 url 必填");
+    if(!pid) throw new Error("請輸入病人 ID");
+    if(!cat) throw new Error("請選擇科別");
+    if(!type) throw new Error("請選擇文件類型");
+    if(!url) throw new Error("請輸入雲端 PDF 連結");
+    if(!title) throw new Error("請輸入文件標題");
 
-    const now = new Date().toISOString();
+    const nowISO = new Date().toISOString();
 
-    const docRef = {
+    return {
       resourceType: "DocumentReference",
-      status: "current",
-      subject: { reference: `Patient/${patientId}` },
-      date: now,
+      status: status,
+      subject: { reference: `Patient/${pid}` },
+      date: nowISO,
+      category: [{ text: cat }],
       type: { text: type },
-      category: [{ text: category }],
       content: [{
         attachment: {
-          contentType: contentType,
+          contentType: "application/pdf",
           url: url,
-          title: title
+          title: title,
+          creation: nowISO
         }
       }]
     };
-
-    if (description) docRef.description = description;
-    if (docStatus) docRef.docStatus = { text: docStatus };
-    if (encounter) docRef.context = { encounter: [{ reference: encounter }] };
-
-    return docRef;
   }
 
-  // =========================
-  // 建立（Create）
-  // =========================
-  document.getElementById('btnCreateDemo').addEventListener('click', () => {
-    document.getElementById('c_patientId').value = "1326";
-    document.getElementById('c_title').value = "檢驗報告 PDF（示例）";
-    document.getElementById('c_url').value = "https://example.com/lab-report.pdf";
-    document.getElementById('c_contentType').value = "application/pdf";
+  document.getElementById('btnDemo').addEventListener('click', () => {
+    document.getElementById('c_patientId').value = "247119";
     document.getElementById('c_category').value = "檢驗科";
-    document.getElementById('c_type').value = "檢驗報告";
-    document.getElementById('c_encounter').value = "";
-    document.getElementById('c_description').value = "此為管理者端示範：FHIR 只存索引與雲端連結。";
-    document.getElementById('c_docStatus').value = "final";
-    setMsg("createMsg", "已填入範例（記得把 url 換成你自己的雲端 PDF 連結）", "ok");
+    document.getElementById('c_type').value = "檢驗報告 (Lab Report)";
+    document.getElementById('c_url').value = "https://example.com/report.pdf";
+    document.getElementById('c_title').value = "系統補建索引（示例）";
+    document.getElementById('c_status').value = "current";
+    showMsg("createMsg", "已填入範例（記得把 URL 換成你自己的雲端 PDF 連結）", "ok");
   });
 
   document.getElementById('btnCreate').addEventListener('click', async () => {
-    try {
-      setMsg("createMsg", "建立中…", "");
-      const payload = makeDocRefPayload();
-      const url = `${base()}/DocumentReference`;
-      const data = await fhirFetch(url, {
+    try{
+      hideMsg("createMsg");
+      showMsg("createMsg", "建立中…", "");
+      const payload = makeCreatePayload();
+      const data = await fhirFetch(`${BASE_URL}/DocumentReference`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/fhir+json"
-        },
+        headers: { "Content-Type":"application/fhir+json" },
         body: JSON.stringify(payload)
       });
-      setMsg("createMsg", `建立成功：DocumentReference/${data.id}`, "ok");
-      // 方便接著查
-      document.getElementById('s_patientId').value = payload.subject.reference.replace("Patient/", "");
-    } catch (e) {
-      setMsg("createMsg", "建立失敗：" + e.message, "err");
+      showMsg("createMsg", `建立成功 ✅ DocumentReference/${data.id}`, "ok");
+      document.getElementById('s_patientId').value = payload.subject.reference.replace("Patient/","");
+    }catch(e){
+      showMsg("createMsg", "建立失敗 ❌ " + e.message, "err");
     }
   });
 
-  // =========================
-  // 查詢（Read/Search）
-  // =========================
+  // ===== Search =====
   document.getElementById('btnClear').addEventListener('click', () => {
+    hideMsg("searchMsg");
     document.getElementById('resultBody').innerHTML = "";
-    document.getElementById('resultTable').classList.add('hidden');
-    setMsg("searchMsg", "", "");
-    closeEdit();
+    document.getElementById('resultTable').classList.add("hidden");
+  });
+
+  function passDeptFilter(r){
+    const f = deptFilter();
+    if(!f) return true;
+    return getCategoryText(r) === f;
+  }
+
+  document.getElementById('deptFilter').addEventListener('change', () => {
+    // 只刷新顯示（重新按查詢更直覺；這裡提醒）
+    showMsg("searchMsg", "科別過濾已變更，請重新按「查詢」更新清單。", "");
   });
 
   document.getElementById('btnSearch').addEventListener('click', async () => {
-    try {
+    try{
+      hideMsg("searchMsg");
       const pid = document.getElementById('s_patientId').value.trim();
-      if (!pid) throw new Error("請輸入病人 ID");
-      setMsg("searchMsg", "查詢中…", "");
-      closeEdit();
+      if(!pid) throw new Error("請輸入病人 ID");
+      showMsg("searchMsg", "查詢中…", "");
 
-      const searchUrl = `${base()}/DocumentReference?subject=Patient/${encodeURIComponent(pid)}`;
-      const bundle = await fhirFetch(searchUrl);
-
+      const bundle = await fhirFetch(`${BASE_URL}/DocumentReference?subject=Patient/${encodeURIComponent(pid)}`);
       const entries = (bundle && bundle.entry) ? bundle.entry : [];
-      if (!entries.length) {
-        document.getElementById('resultBody').innerHTML = "";
-        document.getElementById('resultTable').classList.add('hidden');
-        setMsg("searchMsg", "查不到資料（可能沒有建立過，或伺服器有權限/跨域限制）", "");
-        return;
-      }
-
-      const rows = entries.map(en => en.resource).filter(Boolean).map(r => {
-        const id = r.id || "";
-        const status = r.status || "";
-        const title = (r.content && r.content[0] && r.content[0].attachment && r.content[0].attachment.title) ? r.content[0].attachment.title : "(無標題)";
-        const url = (r.content && r.content[0] && r.content[0].attachment && r.content[0].attachment.url) ? r.content[0].attachment.url : "";
-        const typeText = r.type && r.type.text ? r.type.text : "";
-        const catText = (r.category && r.category[0] && r.category[0].text) ? r.category[0].text : "";
-        return { id, status, title, url, typeText, catText, resource: r };
-      });
+      const all = entries.map(e => e.resource).filter(Boolean);
+      const filtered = all.filter(passDeptFilter);
 
       const tbody = document.getElementById('resultBody');
       tbody.innerHTML = "";
-      for (const row of rows) {
+
+      if(!filtered.length){
+        document.getElementById('resultTable').classList.add("hidden");
+        showMsg("searchMsg", "查無資料（或科別過濾後為空）", "");
+        return;
+      }
+
+      for(const r of filtered){
+        const id = r.id || "";
+        const title = (r.content && r.content[0] && r.content[0].attachment && r.content[0].attachment.title) ? r.content[0].attachment.title : "(無標題)";
+        const cat = getCategoryText(r) || "—";
+        const type = getTypeText(r) || "—";
+        const status = r.status || "—";
+
         const tr = document.createElement('tr');
 
         const tdId = document.createElement('td');
-        tdId.innerHTML = `<div class="mono">${escapeHtml(row.id)}</div>`;
+        tdId.innerHTML = `<div class="mono">${escapeHtml(id)}</div>`;
         tr.appendChild(tdId);
 
         const tdInfo = document.createElement('td');
         tdInfo.innerHTML = `
-          <div><strong>${escapeHtml(row.title)}</strong></div>
-          <div class="small">category：${escapeHtml(row.catText || "—")} ｜ type：${escapeHtml(row.typeText || "—")}</div>
-          <div class="small mono">url：${escapeHtml(row.url || "—")}</div>
+          <div><strong>${escapeHtml(title)}</strong></div>
+          <div class="note">
+            <span class="pill">${escapeHtml(cat)}</span>
+            <span class="pill">${escapeHtml(type)}</span>
+            <span class="pill">status: ${escapeHtml(status)}</span>
+          </div>
         `;
         tr.appendChild(tdInfo);
 
-        const tdStatus = document.createElement('td');
-        tdStatus.innerHTML = `<div>${escapeHtml(row.status || "—")}</div>`;
-        tr.appendChild(tdStatus);
-
         const tdAct = document.createElement('td');
+
         const btnEdit = document.createElement('button');
-        btnEdit.textContent = "修改 metadata";
-        btnEdit.addEventListener('click', () => openEdit(row.id));
-        const btnOpen = document.createElement('button');
-        btnOpen.textContent = "開啟 PDF 連結";
-        btnOpen.addEventListener('click', () => {
-          if (!row.url) alert("這筆沒有 url");
-          else window.open(row.url, "_blank", "noopener");
-        });
+        btnEdit.className = "btn-primary";
+        btnEdit.textContent = "修正 metadata";
+        btnEdit.addEventListener('click', () => openEdit(id));
+
+        const btnDown = document.createElement('button');
+        btnDown.className = "btn-danger";
+        btnDown.textContent = "下架索引";
+        btnDown.style.marginLeft = "8px";
+        btnDown.addEventListener('click', () => quickDeactivate(id));
+
         tdAct.appendChild(btnEdit);
-        tdAct.appendChild(document.createTextNode(" "));
-        tdAct.appendChild(btnOpen);
+        tdAct.appendChild(btnDown);
         tr.appendChild(tdAct);
 
         tbody.appendChild(tr);
       }
 
-      document.getElementById('resultTable').classList.remove('hidden');
-      setMsg("searchMsg", `查到 ${rows.length} 筆（病人 Patient/${pid}）`, "ok");
-    } catch (e) {
-      setMsg("searchMsg", "查詢失敗：" + e.message, "err");
+      document.getElementById('resultTable').classList.remove("hidden");
+      showMsg("searchMsg", `查詢成功 ✅ 共 ${filtered.length} 筆（Policy A：不提供開啟 PDF）`, "ok");
+    }catch(e){
+      showMsg("searchMsg", "查詢失敗 ❌ " + e.message, "err");
     }
   });
 
-  // =========================
-  // 修改（Update）/ 下架
-  // =========================
-  let currentDocRef = null;
+  // ===== Modal edit metadata =====
+  let current = null;
+  const modalBack = document.getElementById('modalBack');
 
-  async function openEdit(id) {
-    try {
-      setMsg("editMsg", "讀取中…", "");
-      document.getElementById('editBox').classList.remove('hidden');
-
-      const url = `${base()}/DocumentReference/${encodeURIComponent(id)}`;
-      const r = await fhirFetch(url);
-      currentDocRef = r;
-
-      // 填表單
-      document.getElementById('e_id').value = r.id || "";
-      document.getElementById('e_status').value = r.status || "current";
-      document.getElementById('e_subject').value = (r.subject && r.subject.reference) ? r.subject.reference : "";
-
-      const att = (r.content && r.content[0] && r.content[0].attachment) ? r.content[0].attachment : {};
-      document.getElementById('e_url').value = att.url || "";
-      document.getElementById('e_contentType').value = att.contentType || "application/pdf";
-      document.getElementById('e_title').value = att.title || "";
-
-      document.getElementById('e_type').value = (r.type && r.type.text) ? r.type.text : "";
-      document.getElementById('e_category').value = (r.category && r.category[0] && r.category[0].text) ? r.category[0].text : "";
-
-      document.getElementById('e_encounter').value =
-        (r.context && r.context.encounter && r.context.encounter[0] && r.context.encounter[0].reference)
-          ? r.context.encounter[0].reference
-          : "";
-
-      document.getElementById('e_description').value = r.description || "";
-      document.getElementById('e_docStatus').value = (r.docStatus && r.docStatus.text) ? r.docStatus.text : "";
-
-      document.getElementById('jsonPreview').textContent = JSON.stringify(r, null, 2);
-      setMsg("editMsg", "已載入，可修改後儲存。", "ok");
-    } catch (e) {
-      setMsg("editMsg", "載入失敗：" + e.message, "err");
-    }
-  }
-
-  function closeEdit() {
-    currentDocRef = null;
-    document.getElementById('editBox').classList.add('hidden');
-    setMsg("editMsg", "", "");
+  function openModal(){ modalBack.style.display = "flex"; }
+  function closeModal(){
+    modalBack.style.display = "none";
+    current = null;
+    hideMsg("editMsg");
     document.getElementById('jsonPreview').textContent = "";
   }
+  document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+  modalBack.addEventListener('click', (e) => { if(e.target === modalBack) closeModal(); });
 
-  document.getElementById('btnCloseEdit').addEventListener('click', closeEdit);
+  async function openEdit(id){
+    try{
+      hideMsg("editMsg");
+      openModal();
+      showMsg("editMsg", "載入中…", "");
 
-  document.getElementById('btnTakeDown').addEventListener('click', async () => {
-    if (!currentDocRef) return;
-    document.getElementById('e_status').value = "entered-in-error";
-    await doUpdate("已設定為 entered-in-error（作廢/下架）");
-  });
+      const r = await fhirFetch(`${BASE_URL}/DocumentReference/${encodeURIComponent(id)}`);
+      current = r;
 
-  document.getElementById('btnUpdate').addEventListener('click', async () => {
-    await doUpdate();
-  });
+      document.getElementById('e_id').value = r.id || "";
+      document.getElementById('e_status').value = r.status || "current";
 
-  async function doUpdate(extraNote) {
-    try {
-      if (!currentDocRef) throw new Error("沒有載入任何 DocumentReference");
+      const att = (r.content && r.content[0] && r.content[0].attachment) ? r.content[0].attachment : {};
+      document.getElementById('e_title').value = att.title || "";
+      document.getElementById('e_url').value = att.url || "";
+      document.getElementById('e_contentType').value = att.contentType || "application/pdf";
 
-      setMsg("editMsg", "更新中…", "");
+      document.getElementById('e_category').value = getCategoryText(r) || "";
+      document.getElementById('e_type').value = getTypeText(r) || "";
+      document.getElementById('e_docStatus').value = getDocStatusCode(r) || "";
+      document.getElementById('e_description').value = r.description || "";
 
-      // 只做 metadata 更新（依你表格）
-      const r = structuredClone(currentDocRef);
-
-      r.status = document.getElementById('e_status').value;
-
-      // subject（少用，但提供）
-      const subjectRef = document.getElementById('e_subject').value.trim();
-      if (subjectRef) r.subject = { reference: subjectRef };
-
-      // attachment
-      r.content = r.content || [{ attachment: {} }];
-      r.content[0] = r.content[0] || { attachment: {} };
-      r.content[0].attachment = r.content[0].attachment || {};
-
-      r.content[0].attachment.url = document.getElementById('e_url').value.trim();
-      r.content[0].attachment.contentType = document.getElementById('e_contentType').value.trim() || "application/pdf";
-      r.content[0].attachment.title = document.getElementById('e_title').value.trim();
-
-      // type/category
-      r.type = { text: document.getElementById('e_type').value.trim() };
-      r.category = [{ text: document.getElementById('e_category').value.trim() }];
-
-      // encounter
-      const enc = document.getElementById('e_encounter').value.trim();
-      if (enc) {
-        r.context = r.context || {};
-        r.context.encounter = [{ reference: enc }];
-      } else if (r.context && r.context.encounter) {
-        // 清掉 encounter（如果使用者清空）
-        delete r.context.encounter;
-        if (Object.keys(r.context).length === 0) delete r.context;
-      }
-
-      // description / docStatus
-      const desc = document.getElementById('e_description').value.trim();
-      if (desc) r.description = desc; else delete r.description;
-
-      const ds = document.getElementById('e_docStatus').value.trim();
-      if (ds) r.docStatus = { text: ds }; else delete r.docStatus;
-
-      // 更新 preview
       document.getElementById('jsonPreview').textContent = JSON.stringify(r, null, 2);
+      showMsg("editMsg", "已載入，可修正 metadata 或下架。", "ok");
+    }catch(e){
+      showMsg("editMsg", "載入失敗 ❌ " + e.message, "err");
+    }
+  }
 
-      // PUT 更新
-      const url = `${base()}/DocumentReference/${encodeURIComponent(r.id)}`;
-      const updated = await fhirFetch(url, {
+  function applyMetaEdits(){
+    const r = structuredClone(current);
+    r.status = document.getElementById('e_status').value;
+
+    // attachment
+    r.content = r.content || [{ attachment: {} }];
+    r.content[0] = r.content[0] || {};
+    r.content[0].attachment = r.content[0].attachment || {};
+    r.content[0].attachment.title = document.getElementById('e_title').value.trim();
+    r.content[0].attachment.url = document.getElementById('e_url').value.trim();
+    r.content[0].attachment.contentType = document.getElementById('e_contentType').value.trim() || "application/pdf";
+
+    // category
+    const cat = document.getElementById('e_category').value.trim();
+    if(cat) r.category = [{ text: cat }];
+    else delete r.category;
+
+    // type
+    const type = document.getElementById('e_type').value.trim();
+    if(type) r.type = { text: type };
+    else delete r.type;
+
+    // docStatus
+    const ds = document.getElementById('e_docStatus').value.trim();
+    if(ds) r.docStatus = { coding: [{ system: "http://hl7.org/fhir/composition-status", code: ds }] };
+    else delete r.docStatus;
+
+    // description（可選）
+    const desc = document.getElementById('e_description').value.trim();
+    if(desc) r.description = desc;
+    else delete r.description;
+
+    return r;
+  }
+
+  document.getElementById('btnSaveMeta').addEventListener('click', async () => {
+    try{
+      if(!current) throw new Error("沒有載入任何 DocumentReference");
+      hideMsg("editMsg");
+      showMsg("editMsg", "儲存中…", "");
+
+      const r = applyMetaEdits();
+      const updated = await fhirFetch(`${BASE_URL}/DocumentReference/${encodeURIComponent(r.id)}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/fhir+json" },
+        headers: { "Content-Type":"application/fhir+json" },
         body: JSON.stringify(r)
       });
 
-      currentDocRef = updated;
+      current = updated;
       document.getElementById('jsonPreview').textContent = JSON.stringify(updated, null, 2);
+      showMsg("editMsg", "儲存成功 ✅（metadata 已更新）", "ok");
+    }catch(e){
+      showMsg("editMsg", "儲存失敗 ❌ " + e.message, "err");
+    }
+  });
 
-      setMsg("editMsg", "更新成功。" + (extraNote ? (" " + extraNote) : ""), "ok");
-    } catch (e) {
-      setMsg("editMsg", "更新失敗：" + e.message, "err");
+  async function quickDeactivate(id){
+    if(!confirm("確定要下架這筆索引？（status=entered-in-error）")) return;
+    try{
+      const r = await fhirFetch(`${BASE_URL}/DocumentReference/${encodeURIComponent(id)}`);
+      r.status = "entered-in-error";
+      await fhirFetch(`${BASE_URL}/DocumentReference/${encodeURIComponent(id)}`, {
+        method: "PUT",
+        headers: { "Content-Type":"application/fhir+json" },
+        body: JSON.stringify(r)
+      });
+      showMsg("searchMsg", "已下架 ✅ 請重新按「查詢」更新清單", "ok");
+    }catch(e){
+      showMsg("searchMsg", "下架失敗 ❌ " + e.message, "err");
     }
   }
 
-  // =========================
-  // HTML escape（避免把資料當成 HTML）
-  // =========================
-  function escapeHtml(str) {
-    return String(str || "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
+  document.getElementById('btnDeactivate').addEventListener('click', async () => {
+    try{
+      if(!current) throw new Error("沒有載入任何 DocumentReference");
+      document.getElementById('e_status').value = "entered-in-error";
+      hideMsg("editMsg");
+      showMsg("editMsg", "下架中…", "");
+      const r = applyMetaEdits();
+      const updated = await fhirFetch(`${BASE_URL}/DocumentReference/${encodeURIComponent(r.id)}`, {
+        method: "PUT",
+        headers: { "Content-Type":"application/fhir+json" },
+        body: JSON.stringify(r)
+      });
+      current = updated;
+      document.getElementById('jsonPreview').textContent = JSON.stringify(updated, null, 2);
+      showMsg("editMsg", "下架完成 ✅（status=entered-in-error）", "ok");
+    }catch(e){
+      showMsg("editMsg", "下架失敗 ❌ " + e.message, "err");
+    }
+  });
 </script>
 </body>
 </html>
